@@ -81,18 +81,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void invokeCamera() {
         Intent imageIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-
-        File imagesFolder = new File(Environment.getExternalStorageDirectory(), "Artworks2");
-        imagesFolder.mkdirs();
-
-        File image = new File(imagesFolder, "QR_" + timeStamp + ".png");
-        mCurrentPhotoPath = image.getAbsolutePath();
-
-        Uri uriSavedImage = Uri.fromFile(image);
-
+        Uri uriSavedImage = createImageFile();
         imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage);
         startActivityForResult(imageIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    private Uri createImageFile() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File imagesFolder = new File(Environment.getExternalStorageDirectory(), "Artworks2");
+        if (!imagesFolder.exists()) {
+            imagesFolder.mkdirs();
+        }
+        File image = new File(imagesFolder, "QR_" + timeStamp + ".png");
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return Uri.fromFile(image);
     }
 
     @Override
@@ -156,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
 
         while (cursor.moveToNext()) {
             String imagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
-            File imageFile = new File(imagePath);
+            File imageFile = new File(mCurrentPhotoPath);
             if (imageFile.canRead() && imageFile.exists()) {
-                Bitmap bm = BitmapFactory.decodeFile(imagePath);
+                Bitmap bm = BitmapFactory.decodeFile(mCurrentPhotoPath);
                 imageView.setImageBitmap(bm);
                 break;
             }

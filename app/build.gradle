@@ -29,6 +29,9 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile 'com.parse.bolts:bolts-tasks:1.4.0'
+    compile 'com.parse.bolts:bolts-applinks:1.4.0'
+    compile 'com.parse:parse-android:1.13.3'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
     compile 'com.jakewharton.rxbinding2:rxbinding-support-v4:2.0.0'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'

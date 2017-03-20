@@ -2,4 +2,6 @@
     <string name="app_name">My Application</string>
     <string name="camera_permision_denied">Camera and Location permissions are needed to fully use this application</string>
     <string name="title_activity_maps">Map</string>
+    <string name="appId">B5HDGVwTpBCHxItY4tHqw2xIqSRFzhlMTlg1GqhV</string>
+    <string name="clientKey">0MBd02yj0eVjJL7d9uOyNNQDnuut50X470ouy8f3</string>
 </resources>
