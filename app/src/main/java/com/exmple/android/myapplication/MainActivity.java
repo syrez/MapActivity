@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,6 +27,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,31 +36,25 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
-    private String capturedImage;
-    private ImageView ivMainPreview;
-    private Location mLastLocation;
-    private RxPermissions rxPermissions;
-    private String mLatitudeText;
     private LocationRequest mLocationRequest;
     private GoogleApiClient mGoogleApiClient;
-    private double latitude;
-    private double longitude;
     private GoogleMap mMap;
     private CameraPosition cameraPosition;
     private LocationManager locationManager;
     private LocationListener listener;
     private String mCurrentPhotoPath;
     private Cursor cursor;
+    private Bitmap currBitmapImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity instance
-
-        //Intent i = new Intent(this, LocationActivity.class);
-        //startActivity(i);
-
+        /*
+        Intent i = new Intent(this, LocationActivity.class);
+        startActivity(i);
+        */
 
         RxView.clicks(findViewById(R.id.btn_tpic))
                 .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
@@ -118,12 +115,28 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            getLastPictureTaken();
+            galleryAddPic();
+            getimage();
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            currBitmapImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            Intent i = new Intent(this, LocationActivity.class);
+            i.putExtra("image", byteArray);
+            startActivity(i);
         }
     }
 
-    private void getLastPictureTaken() {
-        galleryAddPic();
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newWidth) {
+
+        float aspectRatio = bm.getWidth() / (float) bm.getHeight();
+        int width = 480;
+        int height = Math.round(width / aspectRatio);
+
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bm, width, height, false);
+        bm.recycle();
+        return resizedBitmap;
     }
 
     private void getimage() {
@@ -161,7 +174,8 @@ public class MainActivity extends AppCompatActivity {
             File imageFile = new File(mCurrentPhotoPath);
             if (imageFile.canRead() && imageFile.exists()) {
                 Bitmap bm = BitmapFactory.decodeFile(mCurrentPhotoPath);
-                imageView.setImageBitmap(bm);
+                Log.i("Bitmap", bm.toString());
+                currBitmapImage = getResizedBitmap(bm, 150);
                 break;
             }
         }

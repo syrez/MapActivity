@@ -1,11 +1,17 @@
 package com.exmple.android.myapplication;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
+import java.util.List;
 
 /**
  * Created by k3vin on 20-03-17.
  */
-
+/*
 public class ArtworkRepository {
 
     private final ParseObject artwork;
@@ -13,7 +19,7 @@ public class ArtworkRepository {
     ArtworkRepository() {
         this.artwork = new ParseObject("Artwork");
     }
-/*
+
     public void submitArtwork(Artwork artwork) {
         this.artwork.put("title", artwork.getTitle());
         this.artwork.put("description", artwork.getTitle());
@@ -24,8 +30,7 @@ public class ArtworkRepository {
         this.artwork.saveInBackground();
     }
 
-    public void getArtworksNearUser(){
-        ParseGeoPoint userLocation = (ParseGeoPoint) userObject.get("location");
+    public void getArtworksNearUser() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("PlaceObject");
         query.whereNear("location", userLocation);
         query.setLimit(10);
@@ -34,6 +39,7 @@ public class ArtworkRepository {
             public void done(List<ParseObject> objects, ParseException e) {
 
             }
-        };
-    }*/
+        });
+    }
 }
+*/

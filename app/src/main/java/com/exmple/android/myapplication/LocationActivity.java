@@ -1,10 +1,14 @@
 package com.exmple.android.myapplication;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -22,6 +26,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LocationActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerDragListener, MapsTask.Callback {
@@ -45,6 +53,7 @@ public class LocationActivity extends AppCompatActivity implements
     private EditText city;
     private EditText country;
     private EditText street;
+    private Button submitBtn;
 
 
     @Override
@@ -56,12 +65,13 @@ public class LocationActivity extends AppCompatActivity implements
         city = (EditText) findViewById(R.id.et_location_city);
         country = (EditText) findViewById(R.id.et_location_country);
         street = (EditText) findViewById(R.id.et_location_street);
-
+        submitBtn = (Button) findViewById(R.id.btn_location_submit);
+        byte[] imageByteArray = getIntent().getByteArrayExtra("image");
+        Log.e("Bitmap2", "" + imageByteArray);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -176,5 +186,7 @@ public class LocationActivity extends AppCompatActivity implements
             street.setText(address.getAddressLine(0));
         }
     }
+
+    //endregion
 }
 

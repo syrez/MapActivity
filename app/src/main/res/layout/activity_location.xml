@@ -93,8 +93,9 @@
         android:hint="description"
         android:inputType="textFilter"
         app:met_floatingLabel="normal" />
-B
+
     <Button
+        android:id="@+id/btn_location_submit"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
