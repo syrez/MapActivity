@@ -18,7 +18,7 @@ import java.util.Locale;
 public class MapsTask extends AsyncTask<LatLng, Void, Address> {
     private final Context context;
 
-    MapsTask(Context context) {
+    public MapsTask(Context context) {
         this.context = context;
     }
 

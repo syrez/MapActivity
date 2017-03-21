@@ -5,19 +5,15 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -50,13 +46,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        RxPermissions rxPermissions = new RxPermissions(this); // where this is an Activity instance
-        /*
-        Intent i = new Intent(this, LocationActivity.class);
-        startActivity(i);
-        */
 
-        RxView.clicks(findViewById(R.id.btn_tpic))
+        RxPermissions rxPermissions = new RxPermissions(this);
+
+        RxView.clicks(findViewById(R.id.tv_main_takePic))
                 .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
                 .subscribe(granted -> {
                     if (granted) { // Always true pre-M
@@ -65,22 +58,27 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(this, "denied", Toast.LENGTH_SHORT).show();
                     }
                 });
-
-        Button btn2 = (Button) findViewById(R.id.btn_opic);
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getimage();
-            }
-        });
     }
-
 
     private void invokeCamera() {
         Intent imageIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         Uri uriSavedImage = createImageFile();
         imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage);
         startActivityForResult(imageIntent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            galleryAddPic();
+            getimage();
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            currBitmapImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            Intent i = new Intent(this, LocationActivity.class);
+            i.putExtra("image", byteArray);
+            startActivity(i);
+        }
     }
 
     private Uri createImageFile() {
@@ -111,20 +109,6 @@ public class MainActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            galleryAddPic();
-            getimage();
-
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            currBitmapImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            Intent i = new Intent(this, LocationActivity.class);
-            i.putExtra("image", byteArray);
-            startActivity(i);
-        }
     }
 
 
@@ -166,8 +150,6 @@ public class MainActivity extends AppCompatActivity {
                             MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
 
         }
-
-        final ImageView imageView = (ImageView) findViewById(R.id.iv_main_preview);
 
         while (cursor.moveToNext()) {
             String imagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA));

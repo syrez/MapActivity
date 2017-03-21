@@ -1,12 +1,4 @@
-package com.exmple.android.myapplication;
-
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-
-import java.util.List;
+package com.exmple.android.myapplication.Repository;
 
 /**
  * Created by k3vin on 20-03-17.

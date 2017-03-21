@@ -1,17 +1,16 @@
 package com.exmple.android.myapplication;
 
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.exmple.android.myapplication.Helper.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -25,61 +24,94 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class LocationActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerDragListener, MapsTask.Callback {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, MapsTask.Callback {
 
     protected static final String TAG = "MainActivity";
 
-    /**
-     * Provides the entry point to Google Play services.
-     */
-    protected GoogleApiClient mGoogleApiClient;
+    public GoogleApiClient getmGoogleApiClient() {
+        return mGoogleApiClient;
+    }
 
-    /**
-     * Represents a geographical location.
-     */
+    public void setmGoogleApiClient(GoogleApiClient mGoogleApiClient) {
+        this.mGoogleApiClient = mGoogleApiClient;
+    }
+
+
+    protected GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private double latitude;
     private double longitude;
     private LatLng latLng;
     private Marker currLocationMarker;
+
+
     private GoogleMap mMap;
     private EditText city;
     private EditText country;
     private EditText street;
     private Button submitBtn;
+    private EditText description;
+    private LatLng markerPosition;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
-        buildGoogleApiClient();
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+        new GeoLocation(this).buildGoogleApiClient();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(new GeoLocation(this));
 
         city = (EditText) findViewById(R.id.et_location_city);
         country = (EditText) findViewById(R.id.et_location_country);
         street = (EditText) findViewById(R.id.et_location_street);
+        description = (EditText) findViewById(R.id.et_location_description);
         submitBtn = (Button) findViewById(R.id.btn_location_submit);
+
         byte[] imageByteArray = getIntent().getByteArrayExtra("image");
-        Log.e("Bitmap2", "" + imageByteArray);
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "Artwks_" + timeStamp + ".png";
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        //region Clicks Methods
+        submitBtn.setOnClickListener(v -> {
+            ParseObject artwork = new ParseObject("Artworks");
+            ParseFile imageFile = new ParseFile(imageFileName, imageByteArray);
+            ParseGeoPoint point = new ParseGeoPoint(latLng.latitude, latLng.longitude);
+            artwork.put("title", "test");
+            artwork.put("description", description.getText().toString());
+            artwork.put("country", country.getText().toString());
+            artwork.put("city", city.getText().toString());
+            artwork.put("street", street.getText().toString());
+            artwork.put("image", imageFile);
+            artwork.put("location", point);
+            artwork.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null) {
+                        Toast.makeText(LocationActivity.this, "Artwork added", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+            });
+        });
+        //endregion
     }
 
-    protected synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-    }
 
     @Override
     protected void onResume() {
@@ -124,53 +156,10 @@ public class LocationActivity extends AppCompatActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        setMarker(location);
+        new GeoLocation(this).setMarker(location, mMap);
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
-    }
-
-    private void setMarker(Location location) {
-        if (currLocationMarker != null) {
-            currLocationMarker.remove();
-        }
-        latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Your Position");
-        markerOptions.draggable(true);
-        markerOptions.snippet("Population: 4,137,400");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-        currLocationMarker = mMap.addMarker(markerOptions);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setMyLocationEnabled(true);
-        mMap.setBuildingsEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        mMap.setOnMarkerDragListener(this);
-    }
-
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDrag(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-        LatLng markerPosition = marker.getPosition();
-        MapsTask mapsTask = new MapsTask(this);
-        mapsTask.execute(markerPosition);
     }
 
     @Override
@@ -188,5 +177,25 @@ public class LocationActivity extends AppCompatActivity implements
     }
 
     //endregion
+
+    public GoogleMap getmMap() {
+        return mMap;
+    }
+
+    public void setmMap(GoogleMap mMap) {
+        this.mMap = mMap;
+    }
+
+    public LatLng getMarkerPosition() {
+        return markerPosition;
+    }
+
+    public void setMarkerPosition(LatLng markerPosition) {
+        this.markerPosition = markerPosition;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
+    }
 }
 
