@@ -1,6 +1,5 @@
 package com.exmple.android.myapplication;
 
-import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -11,22 +10,26 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.exmple.android.myapplication.Helper.ArtwprksRecyclerViewAdapter;
+import com.exmple.android.myapplication.Model.ItemObjects;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private String mCurrentPhotoPath;
     private Cursor cursor;
     private Bitmap currBitmapImage;
+    private StaggeredGridLayoutManager artworksGridLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         RxPermissions rxPermissions = new RxPermissions(this);
 
+        /*
         RxView.clicks(findViewById(R.id.tv_main_takePic))
                 .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
                 .subscribe(granted -> {
@@ -58,6 +63,82 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(this, "denied", Toast.LENGTH_SHORT).show();
                     }
                 });
+        */
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+
+        artworksGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
+
+        recyclerView.setLayoutManager(artworksGridLayoutManager);
+
+        List<ItemObjects> gaggeredList = getListItemData();
+
+        ArtwprksRecyclerViewAdapter rcAdapter = new ArtwprksRecyclerViewAdapter(MainActivity.this, gaggeredList);
+        recyclerView.setAdapter(rcAdapter);
+    }
+
+
+    private List<ItemObjects> getListItemData() {
+        List<ItemObjects> listViewItems = new ArrayList<ItemObjects>();
+        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
+        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
+        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
+        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
+        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
+        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
+        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
+        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
+        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
+        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
+        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
+        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
+        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
+        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
+        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
+        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
+        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
+        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
+        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
+        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
+        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
+        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
+        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
+        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
+        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
+        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
+        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
+        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
+        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
+        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
+        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
+        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
+        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
+        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
+        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
+        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
+        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
+        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
+        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
+        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
+        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
+        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
+        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
+        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
+        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
+        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
+        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
+        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
+        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
+        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
+        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
+        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
+        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
+        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
+        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
+        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
+
+
+        return listViewItems;
     }
 
     private void invokeCamera() {
@@ -95,12 +176,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-    }
-
-    private String getPictureName() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String timestamp = sdf.format(new Date());
-        return "TakenPhoto" + timestamp + "jpg";
     }
 
     private void galleryAddPic() {

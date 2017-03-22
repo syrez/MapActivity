@@ -1,4 +1,4 @@
-package com.exmple.android.myapplication;
+package com.exmple.android.myapplication.Model;
 
 public class User {
     public String name;
