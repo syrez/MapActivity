@@ -25,7 +25,6 @@ import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -123,7 +122,6 @@ public class NewArtworkActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        RxPermissions rxPermissions = new RxPermissions(this);
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         mLocationRequest = new LocationRequest();

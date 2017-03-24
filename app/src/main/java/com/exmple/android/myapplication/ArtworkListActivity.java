@@ -1,20 +1,27 @@
 package com.exmple.android.myapplication;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.exmple.android.myapplication.Adapters.ArtworksRecyclerViewAdapter;
@@ -23,13 +30,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
-import com.jakewharton.rxbinding2.view.RxView;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,7 +64,7 @@ public class ArtworkListActivity extends AppCompatActivity implements ArtworksRe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        RxPermissions rxPermissions = new RxPermissions(this);
+        TextView takePic = (TextView) findViewById(R.id.tv_main_takePic);
 
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Artworks");
@@ -81,16 +86,6 @@ public class ArtworkListActivity extends AppCompatActivity implements ArtworksRe
 
             }
         });
-
-        RxView.clicks(findViewById(R.id.tv_main_takePic))
-                .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
-                .subscribe(granted -> {
-                    if (granted) { // Always true pre-M
-                        invokeCamera();
-                    } else {
-                        Toast.makeText(this, "denied", Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
 
@@ -210,4 +205,32 @@ public class ArtworkListActivity extends AppCompatActivity implements ArtworksRe
         i.putExtra("id", id);
         startActivity(i);
     }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void getPermissionToOpenCamera() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            if (shouldShowRequestPermissionRationale(
+                    Manifest.permission.CAMERA)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("This er");
+                builder.setCancelable(true);
+
+                builder.setPositiveButton("Yes", (dialog, id) ->
+
+                        dialog.cancel());
+                builder.setNegativeButton("No", (dialog, id) -> dialog.cancel());
+
+                AlertDialog alert11 = builder.create();
+                alert11.show();
+            }
+
+            // Fire off an async request to actually get the permission
+            // This will show the standard permission request dialog UI
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS},
+                    READ_CONTACTS_PERMISSIONS_REQUEST);
+        }
+    }
+
+
 }
