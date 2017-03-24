@@ -39,14 +39,16 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAK1gRgoYQxmKaZ7eJmfDBf0JhN3WvRDdc" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".ArtworkListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LocationActivity"></activity>
+        <activity android:name=".NewArtworkActivity" />
+        <activity android:name=".ArtworkDetailsActivity" />
+        <activity android:name=".CameraGalleryActivity"></activity>
     </application>
 
 </manifest>

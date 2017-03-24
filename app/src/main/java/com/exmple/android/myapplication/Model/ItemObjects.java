@@ -1,16 +1,19 @@
 package com.exmple.android.myapplication.Model;
 
+
 /**
  * Created by k3vin on 21-03-17.
  */
 
 public class ItemObjects {
+    private String objectId;
     private String name;
-    private int photo;
+    private int url;
 
-    public ItemObjects(String name, int photo) {
+    public ItemObjects(String name, int url) {
         this.name = name;
-        this.photo = photo;
+        this.url = url;
+        this.objectId = objectId;
     }
 
     public String getName() {
@@ -21,11 +24,15 @@ public class ItemObjects {
         this.name = name;
     }
 
-    public int getPhoto() {
-        return photo;
+    public int getUrl() {
+        return url;
     }
 
-    public void setPhoto(int photo) {
-        this.photo = photo;
+    public void setUrl(int url) {
+        this.url = url;
+    }
+
+    public String getObjectId() {
+        return objectId;
     }
 }

@@ -1,5 +1,6 @@
 package com.exmple.android.myapplication;
 
+import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -16,12 +17,18 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.exmple.android.myapplication.Helper.ArtwprksRecyclerViewAdapter;
-import com.exmple.android.myapplication.Model.ItemObjects;
+import com.exmple.android.myapplication.Adapters.ArtworksRecyclerViewAdapter;
+import com.exmple.android.myapplication.Model.Artwork;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.jakewharton.rxbinding2.view.RxView;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.ByteArrayOutputStream;
@@ -31,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class ArtworkListActivity extends AppCompatActivity implements ArtworksRecyclerViewAdapter.Callback {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
@@ -44,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private String mCurrentPhotoPath;
     private Cursor cursor;
     private Bitmap currBitmapImage;
+    List<Artwork> listArtworkServer = new ArrayList<Artwork>();
     private StaggeredGridLayoutManager artworksGridLayoutManager;
 
     @Override
@@ -53,7 +61,27 @@ public class MainActivity extends AppCompatActivity {
 
         RxPermissions rxPermissions = new RxPermissions(this);
 
-        /*
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Artworks");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e == null) {
+                    for (ParseObject object : objects) {
+                        ParseFile postImage = object.getParseFile("image");
+                        String imageUrl = postImage.getUrl();
+                        String title = (String) object.get("title");
+                        String id = (String) object.getObjectId();
+                        listArtworkServer.add(new Artwork(title, imageUrl, id));
+                        populateListArtwork();
+                    }
+                } else {
+                    Toast.makeText(ArtworkListActivity.this, "we couldn't find any results :/ Try to refreshZ", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
         RxView.clicks(findViewById(R.id.tv_main_takePic))
                 .compose(rxPermissions.ensure(Manifest.permission.CAMERA))
                 .subscribe(granted -> {
@@ -63,83 +91,8 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(this, "denied", Toast.LENGTH_SHORT).show();
                     }
                 });
-        */
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-
-        artworksGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
-
-        recyclerView.setLayoutManager(artworksGridLayoutManager);
-
-        List<ItemObjects> gaggeredList = getListItemData();
-
-        ArtwprksRecyclerViewAdapter rcAdapter = new ArtwprksRecyclerViewAdapter(MainActivity.this, gaggeredList);
-        recyclerView.setAdapter(rcAdapter);
     }
 
-
-    private List<ItemObjects> getListItemData() {
-        List<ItemObjects> listViewItems = new ArrayList<ItemObjects>();
-        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
-        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
-        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
-        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
-        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
-        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
-        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
-        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
-        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
-        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
-        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
-        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
-        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
-        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
-        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
-        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
-        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
-        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
-        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
-        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
-        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
-        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
-        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
-        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
-        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
-        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
-        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
-        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
-        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
-        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
-        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
-        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
-        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
-        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
-        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
-        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
-        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
-        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
-        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
-        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
-        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
-        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
-        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
-        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
-        listViewItems.add(new ItemObjects("Alkane", R.drawable.one));
-        listViewItems.add(new ItemObjects("Ethane", R.drawable.two));
-        listViewItems.add(new ItemObjects("Alkyne", R.drawable.three));
-        listViewItems.add(new ItemObjects("Benzene", R.drawable.four));
-        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
-        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
-        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
-        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
-        listViewItems.add(new ItemObjects("Amide", R.drawable.one));
-        listViewItems.add(new ItemObjects("Amino Acid", R.drawable.two));
-        listViewItems.add(new ItemObjects("Phenol", R.drawable.three));
-        listViewItems.add(new ItemObjects("Carbonxylic", R.drawable.four));
-
-
-        return listViewItems;
-    }
 
     private void invokeCamera() {
         Intent imageIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -156,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             currBitmapImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
-            Intent i = new Intent(this, LocationActivity.class);
+            Intent i = new Intent(this, NewArtworkActivity.class);
             i.putExtra("image", byteArray);
             startActivity(i);
         }
@@ -178,6 +131,20 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    private void populateListArtwork() {
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+
+        artworksGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
+
+        recyclerView.setLayoutManager(artworksGridLayoutManager);
+
+        List<Artwork> listArtworkLocal = this.listArtworkServer;
+
+        ArtworksRecyclerViewAdapter rcAdapter = new ArtworksRecyclerViewAdapter(ArtworkListActivity.this, listArtworkLocal);
+        recyclerView.setAdapter(rcAdapter);
+    }
+
     private void galleryAddPic() {
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         File f = new File(mCurrentPhotoPath);
@@ -185,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
     }
-
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth) {
 
@@ -236,5 +202,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    @Override
+    public void getIdFromArtwork(String id) {
+        Intent i = new Intent(this, ArtworkDetailsActivity.class);
+        i.putExtra("id", id);
+        startActivity(i);
     }
 }

@@ -2,8 +2,8 @@ package com.exmple.android.myapplication.Helper;
 
 import android.location.Location;
 
-import com.exmple.android.myapplication.LocationActivity;
-import com.exmple.android.myapplication.MapsTask;
+import com.exmple.android.myapplication.AsyncTask.ReverseGeocodingTask;
+import com.exmple.android.myapplication.NewArtworkActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -11,17 +11,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 
-public class GeoLocation implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener {
+public class GeoLocationService implements OnMapReadyCallback, GoogleMap.OnMarkerDragListener {
 
-    private final LocationActivity activity;
+    private final NewArtworkActivity activity;
     private Marker currLocationMarker;
 
-    public GeoLocation(LocationActivity activity) {
+    public GeoLocationService(NewArtworkActivity activity) {
         this.activity = activity;
     }
 
@@ -76,12 +75,9 @@ public class GeoLocation implements OnMapReadyCallback, GoogleMap.OnMarkerDragLi
 
         LatLng markerPosition = marker.getPosition();
         activity.setMarkerPosition(markerPosition);
-        MapsTask mapsTask = new MapsTask(activity);
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(markerPosition);
-        LatLngBounds bounds = builder.build();
-        activity.getmMap().animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
-        mapsTask.execute(activity.getMarkerPosition());
+        ReverseGeocodingTask reverseGeocodingTask = new ReverseGeocodingTask(activity);
+        activity.getmMap().animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
+        reverseGeocodingTask.execute(activity.getMarkerPosition());
     }
 }
 

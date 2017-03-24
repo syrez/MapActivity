@@ -10,7 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.exmple.android.myapplication.Helper.GeoLocation;
+import com.exmple.android.myapplication.AsyncTask.ReverseGeocodingTask;
+import com.exmple.android.myapplication.Helper.GeoLocationService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -19,7 +20,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -30,10 +30,10 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class LocationActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, MapsTask.Callback {
+public class NewArtworkActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ReverseGeocodingTask.Callback {
 
-    protected static final String TAG = "MainActivity";
+    protected static final String TAG = "ArtworkListActivity";
 
     public GoogleApiClient getmGoogleApiClient() {
         return mGoogleApiClient;
@@ -46,12 +46,7 @@ public class LocationActivity extends AppCompatActivity implements
 
     protected GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private double latitude;
-    private double longitude;
     private LatLng latLng;
-    private Marker currLocationMarker;
-
-
     private GoogleMap mMap;
     private EditText city;
     private EditText country;
@@ -64,20 +59,20 @@ public class LocationActivity extends AppCompatActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_location);
+        setContentView(R.layout.activity_submitform);
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        new GeoLocation(this).buildGoogleApiClient();
+        new GeoLocationService(this).buildGoogleApiClient();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(new GeoLocation(this));
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fm_submitform_map);
+        mapFragment.getMapAsync(new GeoLocationService(this));
 
-        city = (EditText) findViewById(R.id.et_location_city);
-        country = (EditText) findViewById(R.id.et_location_country);
-        street = (EditText) findViewById(R.id.et_location_street);
-        description = (EditText) findViewById(R.id.et_location_description);
-        submitBtn = (Button) findViewById(R.id.btn_location_submit);
+        city = (EditText) findViewById(R.id.et_submitform_city);
+        country = (EditText) findViewById(R.id.et_submitform_country);
+        street = (EditText) findViewById(R.id.et_submitform_street);
+        description = (EditText) findViewById(R.id.et_submitform_description);
+        submitBtn = (Button) findViewById(R.id.btn_submitform_submit);
 
         byte[] imageByteArray = getIntent().getByteArrayExtra("image");
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -99,7 +94,7 @@ public class LocationActivity extends AppCompatActivity implements
                 @Override
                 public void done(ParseException e) {
                     if (e == null) {
-                        Toast.makeText(LocationActivity.this, "Artwork added", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(NewArtworkActivity.this, "Artwork added", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 }
@@ -152,15 +147,17 @@ public class LocationActivity extends AppCompatActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        new GeoLocation(this).setMarker(location, mMap);
+        new GeoLocationService(this).setMarker(location, mMap);
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         }
+        ReverseGeocodingTask reverseGeocodingTask = new ReverseGeocodingTask(this);
+        reverseGeocodingTask.execute(new LatLng(location.getLatitude(), location.getLongitude()));
     }
 
     public void setAdress(Address address) {
         if (address == null) {
-            Toast.makeText(this, "Oups we couldnt find your position, please try again", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Oups we couldn't find your position, please try again", Toast.LENGTH_SHORT).show();
             country.setText("");
             city.setText("");
             street.setText("");

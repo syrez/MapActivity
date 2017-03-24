@@ -1,4 +1,4 @@
-package com.exmple.android.myapplication;
+package com.exmple.android.myapplication.AsyncTask;
 
 import android.content.Context;
 import android.location.Address;
@@ -15,18 +15,18 @@ import java.util.Locale;
  * Created by k3vin on 19-03-17.
  */
 
-public class MapsTask extends AsyncTask<LatLng, Void, Address> {
+public class ReverseGeocodingTask extends AsyncTask<LatLng, Void, Address> {
     private final Context context;
 
-    public MapsTask(Context context) {
+    public ReverseGeocodingTask(Context context) {
         this.context = context;
     }
 
-    interface Callback {
+    public interface Callback {
         void setAdress(Address adress);
     }
 
-    protected Address doInBackground(LatLng... params) {
+    public Address doInBackground(LatLng... params) {
 
         Geocoder myLocation = new Geocoder(this.context, Locale.getDefault());
         try {
@@ -42,8 +42,10 @@ public class MapsTask extends AsyncTask<LatLng, Void, Address> {
     }
 
     @Override
-    protected void onPostExecute(Address address) {
+    public void onPostExecute(Address address) {
         super.onPostExecute(address);
         ((Callback) context).setAdress(address);
     }
+
+
 }
